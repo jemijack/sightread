@@ -3,12 +3,13 @@ import clsx from 'clsx'
 export type CountdownOverlayProps = {
   total: number
   remaining: number
+  enabled: boolean
 }
 
-export default function CountdownOverlay({ total, remaining }: CountdownOverlayProps) {
+export default function CountdownOverlay({ total, remaining, enabled }: CountdownOverlayProps) {
   const safeTotal = Math.max(0, Math.round(total))
   const safeRemaining = Math.max(0, Math.min(safeTotal, Math.round(remaining)))
-  if (safeTotal === 0 || safeRemaining === 0) {
+  if (!enabled || safeRemaining === 0) {
     return null
   }
   return (

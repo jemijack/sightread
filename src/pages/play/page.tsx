@@ -121,8 +121,9 @@ export default function PlaySongPage() {
   const [statsVisible, setStatsVisible] = useState(false)
   const [isSettingsOpen, setSettingsOpen] = useState(false)
   const playerState = usePlayerState()
-  const countdownTotal = useAtomValue(player.countdownSeconds)
+  const countdownTotal = useAtomValue(player.countdownTotal)
   const countdownRemaining = useAtomValue(player.countdownRemaining)
+  const countdownEnabledValue = useAtomValue(player.countdownEnabled)
   const synth = useLazyStableRef(() => getSynthStub('acoustic_grand_piano'))
   let { data: song, error, isLoading, mutate } = useSong(id, source)
   let songMeta = useSongMetadata(id, source)
@@ -163,8 +164,8 @@ export default function PlaySongPage() {
 
   const metronome = songConfig.metronome ?? getDefaultSongSettings(song ?? undefined).metronome
   const loopConfig = songConfig.loop ?? getDefaultSongSettings(song ?? undefined).loop
-  const countdownSeconds =
-    songConfig.countdownSeconds ?? getDefaultSongSettings(song ?? undefined).countdownSeconds
+  const countdownEnabled =
+    songConfig.countdownEnabled ?? getDefaultSongSettings(song ?? undefined).countdownEnabled
   const transpose = songConfig.transpose ?? getDefaultSongSettings(song ?? undefined).transpose
   useEffect(() => {
     if (!songConfig.metronome) {
@@ -177,10 +178,10 @@ export default function PlaySongPage() {
     }
   }, [loopConfig, setSongConfig, songConfig])
   useEffect(() => {
-    if (songConfig.countdownSeconds == null) {
-      setSongConfig({ ...songConfig, countdownSeconds })
+    if (songConfig.countdownEnabled == null) {
+      setSongConfig({ ...songConfig, countdownEnabled })
     }
-  }, [countdownSeconds, setSongConfig, songConfig])
+  }, [countdownEnabled, setSongConfig, songConfig])
   useEffect(() => {
     if (songConfig.transpose == null) {
       setSongConfig({ ...songConfig, transpose })
@@ -190,8 +191,8 @@ export default function PlaySongPage() {
     player.applyMetronomeConfig(metronome)
   }, [metronome, player])
   useEffect(() => {
-    player.applyCountdownConfig(countdownSeconds)
-  }, [countdownSeconds, player])
+    player.applyCountdownConfig(countdownEnabled)
+  }, [countdownEnabled, player])
   useEffect(() => {
     player.applyTransposeConfig(transpose)
   }, [transpose, player])
@@ -433,7 +434,11 @@ export default function PlaySongPage() {
           />
           {playerState.countingDown && countdownTotal > 0 && (
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-              <CountdownOverlay total={countdownTotal} remaining={countdownRemaining} />
+              <CountdownOverlay
+                total={countdownTotal}
+                remaining={countdownRemaining}
+                enabled={countdownEnabledValue}
+              />
             </div>
           )}
           {!isRecording && isSettingsOpen ? (
