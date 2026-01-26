@@ -433,10 +433,7 @@ export default function PlaySongPage() {
           />
           {playerState.countingDown && countdownTotal > 0 && (
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-              <CountdownOverlay
-                total={countdownTotal}
-                remaining={countdownRemaining}
-              />
+              <CountdownOverlay total={countdownTotal} remaining={countdownRemaining} />
             </div>
           )}
           {!isRecording && isSettingsOpen ? (
