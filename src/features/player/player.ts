@@ -14,6 +14,8 @@ function increment(x: number) {
 type JotaiStore = ReturnType<typeof getDefaultStore>
 const GOOD_RANGE = 300
 const PERFECT_RANGE = 50
+const DEFAULT_BPM = 120
+const DEFAULT_TIME_SIGNATURE = { numerator: 4, denominator: 4 }
 
 interface Score {
   perfect: PrimitiveAtom<number>
@@ -329,7 +331,6 @@ export class Player {
     return this.store.get(this.bpmModifier)
   }
 
-
   setBpmModifier(value: number) {
     this.store.set(this.bpmModifier, round(value, 2))
   }
@@ -351,30 +352,32 @@ export class Player {
     return index
   }
 
-  getBpmForTime(time: number) {
+  getBpmForTime(time: number): number {
     const song = this.getSong()
     const bpmModifier = this.store.get(this.bpmModifier)
     if (!song) {
-      return 120 * bpmModifier
+      return DEFAULT_BPM * bpmModifier
     }
+
     const index = this.getBpmIndexForTime(time)
-    return (song.bpms[index]?.bpm ?? 120) * bpmModifier
+    return (song.bpms[index]?.bpm ?? DEFAULT_BPM) * bpmModifier
   }
 
-  getTimeSignatureForTime(time: number) {
+  getTimeSignatureForTime(time: number): { numerator: number; denominator: number } {
     const song = this.getSong()
     if (!song) {
-      return { numerator: 4, denominator: 4 }
+      return DEFAULT_TIME_SIGNATURE
     }
+
     const timeSignatures = song.timeSignatures
     if (timeSignatures && timeSignatures.length > 0) {
       const index = timeSignatures.findIndex((sig) => sig.time > time) - 1
       if (index >= 0) {
         return timeSignatures[index]
       }
-      return timeSignatures[0] ?? { numerator: 4, denominator: 4 }
+      return timeSignatures[0] ?? DEFAULT_TIME_SIGNATURE
     }
-    return song.timeSignature ?? { numerator: 4, denominator: 4 }
+    return song.timeSignature ?? DEFAULT_TIME_SIGNATURE
   }
 
   getCountdownTimeReference_(time: number) {
@@ -690,11 +693,11 @@ export class Player {
   getCountdownConfig_(time: number) {
     const referenceTime = this.getCountdownTimeReference_(time)
     const { numerator, denominator } = this.getTimeSignatureForTime(referenceTime)
-    const safeBpm = Math.max(1, this.getBpmForTime(referenceTime))
-    const safeDenominator = denominator > 0 ? denominator : 4
-    const safeNumerator = Math.max(1, Math.round(numerator))
-    const beatSeconds = (60 / safeBpm) * (4 / safeDenominator)
-    return { total: safeNumerator, intervalMs: Math.max(1, beatSeconds * 1000) }
+    const clampedBpm = Math.max(1, this.getBpmForTime(referenceTime))
+    const clampedDenominator = denominator > 0 ? denominator : 4
+    const clampedNumerator = Math.max(1, Math.round(numerator))
+    const beatSeconds = (60 / clampedBpm) * (4 / clampedDenominator)
+    return { total: clampedNumerator, intervalMs: Math.max(1, beatSeconds * 1000) }
   }
 
   startCountdown_() {
