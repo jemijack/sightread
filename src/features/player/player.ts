@@ -712,17 +712,17 @@ export class Player {
     this.store.set(this.countdownRemaining, total)
     const volume = Math.max(0, this.store.get(this.metronomeVolume))
     const velocity = Math.min(127, Math.round(volume * 127))
-    const playTick = (accented: boolean) => {
+    const playTick = () => {
       if (velocity > 0) {
-        this.metronomeSynth.playNote(accented ? 90 : 75, velocity)
+        this.metronomeSynth.playNote(75, velocity)
       }
     }
-    playTick(this.store.get(this.metronomeEmphasizeFirst))
+    playTick()
     this.countdownInterval = setInterval(() => {
       const nextRemaining = Math.max(0, this.store.get(this.countdownRemaining) - 1)
       this.store.set(this.countdownRemaining, nextRemaining)
       if (nextRemaining > 0) {
-        playTick(false)
+        playTick()
         return
       }
       if (this.countdownInterval) {
