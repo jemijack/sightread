@@ -123,7 +123,6 @@ export default function PlaySongPage() {
   const playerState = usePlayerState()
   const countdownTotal = useAtomValue(player.countdownTotal)
   const countdownRemaining = useAtomValue(player.countdownRemaining)
-  const countdownEnabledValue = useAtomValue(player.countdownEnabled)
   const synth = useLazyStableRef(() => getSynthStub('acoustic_grand_piano'))
   let { data: song, error, isLoading, mutate } = useSong(id, source)
   let songMeta = useSongMetadata(id, source)
@@ -437,7 +436,6 @@ export default function PlaySongPage() {
               <CountdownOverlay
                 total={countdownTotal}
                 remaining={countdownRemaining}
-                enabled={countdownEnabledValue}
               />
             </div>
           )}

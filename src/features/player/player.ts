@@ -410,10 +410,9 @@ export class Player {
       return
     }
 
-    const countdownEnabled = this.store.get(this.countdownEnabled)
-    if (this.shouldCountdown(countdownEnabled)) {
+    if (this.shouldCountdown()) {
       this.clearCountdown_()
-      this.startCountdown_(countdownEnabled)
+      this.startCountdown_()
       return
     }
 
@@ -488,8 +487,7 @@ export class Player {
     if (range) {
       let [start, stop] = range
       if (prevTime <= stop && stop <= time) {
-        const countdownEnabled = this.store.get(this.countdownEnabled)
-        if (this.shouldCountdown(countdownEnabled, start)) {
+        if (this.shouldCountdown(start)) {
           this.seek(start)
           this.pause()
           this.play()
@@ -658,7 +656,7 @@ export class Player {
   }
 
   applyCountdownConfig(enabled: boolean) {
-    if (!this.isCountdownEnabled(enabled) && this.isCountingDown()) {
+    if (!enabled && this.isCountingDown()) {
       this.clearCountdown_(true)
       this.startPlayback_()
     }
@@ -673,12 +671,8 @@ export class Player {
     return transposeMidi(midiNote, this.store.get(this.transpose))
   }
 
-  isCountdownEnabled(enabled: boolean) {
-    return enabled
-  }
-
-  shouldCountdown(enabled: boolean, timeOverride?: number) {
-    if (!this.isCountdownEnabled(enabled)) {
+  shouldCountdown(timeOverride?: number) {
+    if (!this.store.get(this.countdownEnabled)) {
       return false
     }
     const time = timeOverride ?? this.getTime()
@@ -703,10 +697,7 @@ export class Player {
     return { total: safeNumerator, intervalMs: Math.max(1, beatSeconds * 1000) }
   }
 
-  startCountdown_(enabled: boolean) {
-    if (!enabled) {
-      return
-    }
+  startCountdown_() {
     this.clearCountdown_()
     this.store.set(this.state, 'CountingDown')
     const { total, intervalMs } = this.getCountdownConfig_(this.getTime())
