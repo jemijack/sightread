@@ -691,12 +691,14 @@ export class Player {
   getCountdownConfig_(time: number) {
     const referenceTime = this.getCountdownTimeReference_(time)
 
-    const { numerator, denominator } = this.getTimeSignatureForTime(referenceTime)
-    const clampedBpm = Math.max(1, this.getBpmForTime(referenceTime))
-    const clampedDenominator = denominator > 0 ? denominator : 4
-    const clampedNumerator = Math.max(1, Math.round(numerator))
-    const beatSeconds = (60 / clampedBpm) * (4 / clampedDenominator)
-    return { total: clampedNumerator, intervalMs: Math.max(1, beatSeconds * 1000) }
+    let { numerator, denominator } = this.getTimeSignatureForTime(referenceTime)
+    numerator = Math.max(Math.round(numerator), 1)
+    denominator = denominator > 0 ? denominator : DEFAULT_TIME_SIGNATURE.denominator
+
+    const bpm = Math.max(this.getBpmForTime(referenceTime), 1)
+
+    const beatSeconds = (60 / bpm) * (4 / denominator)
+    return { total: numerator, intervalMs: Math.max(1, beatSeconds * 1000) }
   }
 
   startCountdown_() {
