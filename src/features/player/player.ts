@@ -353,23 +353,16 @@ export class Player {
   }
 
   getBpmForTime(time: number): number {
-    const song = this.getSong()
-    const bpmModifier = this.store.get(this.bpmModifier)
-    if (!song) {
-      return DEFAULT_BPM * bpmModifier
-    }
-
     const index = this.getBpmIndexForTime(time)
-    return (song.bpms[index]?.bpm ?? DEFAULT_BPM) * bpmModifier
+    const bpmModifier = this.store.get(this.bpmModifier)
+
+    return (this.getSong()?.bpms[index]?.bpm ?? DEFAULT_BPM) * bpmModifier
   }
 
   getTimeSignatureForTime(time: number): { numerator: number; denominator: number } {
     const song = this.getSong()
-    if (!song) {
-      return DEFAULT_TIME_SIGNATURE
-    }
+    const timeSignatures = song?.timeSignatures
 
-    const timeSignatures = song.timeSignatures
     if (timeSignatures && timeSignatures.length > 0) {
       const index = timeSignatures.findIndex((sig) => sig.time > time) - 1
       if (index >= 0) {
@@ -377,16 +370,21 @@ export class Player {
       }
       return timeSignatures[0] ?? DEFAULT_TIME_SIGNATURE
     }
-    return song.timeSignature ?? DEFAULT_TIME_SIGNATURE
+
+    return song?.timeSignature ?? DEFAULT_TIME_SIGNATURE
   }
 
   getCountdownTimeReference_(time: number) {
     const song = this.getSong()
-    if (!song || time > 0.001) {
+    if (!song) {
       return time
     }
-    const firstMeasure = song.measures[0]
-    const secondMeasure = song.measures[1]
+    let index = song.measures.findIndex((m) => m.time > time) - 1
+    if (index < 0) {
+      index = song.measures.length - 1
+    }
+    const firstMeasure = song.measures[index]
+    const secondMeasure = song.measures[index + 1]
     if (!firstMeasure || !secondMeasure) {
       return time
     }
@@ -692,6 +690,7 @@ export class Player {
 
   getCountdownConfig_(time: number) {
     const referenceTime = this.getCountdownTimeReference_(time)
+
     const { numerator, denominator } = this.getTimeSignatureForTime(referenceTime)
     const clampedBpm = Math.max(1, this.getBpmForTime(referenceTime))
     const clampedDenominator = denominator > 0 ? denominator : 4
