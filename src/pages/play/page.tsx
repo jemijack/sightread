@@ -394,8 +394,9 @@ export default function PlaySongPage() {
   return (
     <>
       <title>Playing</title>
+      {/* Change h-screen to h-[100dvh] to respect iOS browser UI boundaries */}
       <div
-        className={clsx('fixed grid h-screen w-screen grid-rows-[auto_1fr_auto] outline-none')}
+        className={clsx('fixed grid h-[100dvh] w-screen grid-rows-[auto_1fr_auto] outline-none')}
         {...midiState.getListenerProps()}
         autoFocus
       >
