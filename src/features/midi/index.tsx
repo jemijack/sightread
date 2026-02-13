@@ -372,3 +372,7 @@ export function useRecordMidi(state = midiState) {
 }
 
 export default midiState
+
+// Connect to WebSocket MIDI relay (server mode).
+// Fails silently if no server is running.
+import('./websocket-midi')
