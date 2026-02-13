@@ -243,13 +243,17 @@ export default function SongScrubBar({
           <div ref={rangeRef} className="pointer-events-none absolute flex h-full items-center">
             <div className="bg-purple-dark/40 absolute h-4 w-[calc(100%-10px)]" />
             <div
-              className="bg-purple-dark/90 hover:bg-purple-hover/90 pointer-events-auto absolute left-0 h-6 w-6 -translate-x-1/2 cursor-pointer rounded-full transition"
+              className="pointer-events-auto absolute left-0 flex h-12 w-12 -translate-x-1/2 cursor-pointer items-center justify-center"
               onPointerDown={() => (isDraggingL.current = true)}
-            />
+            >
+              <div className="bg-purple-dark/90 hover:bg-purple-hover/90 h-7 w-7 rounded-full transition" />
+            </div>
             <div
-              className="bg-purple-dark/90 hover:bg-purple-hover/90 pointer-events-auto absolute right-0 h-6 w-6 translate-x-1/2 cursor-pointer rounded-full transition"
+              className="pointer-events-auto absolute right-0 flex h-12 w-12 translate-x-1/2 cursor-pointer items-center justify-center"
               onPointerDown={() => (isDraggingR.current = true)}
-            />
+            >
+              <div className="bg-purple-dark/90 hover:bg-purple-hover/90 h-7 w-7 rounded-full transition" />
+            </div>
           </div>
         )}
       </div>

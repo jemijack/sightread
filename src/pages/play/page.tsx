@@ -446,6 +446,12 @@ export default function PlaySongPage() {
                 onLoopToggled={handleLoopingToggle}
                 isLooping={isLooping}
                 onClose={() => setSettingsOpen(false)}
+                onSetLoopRange={(range) => {
+                  setSongConfig({
+                    ...songConfig,
+                    loop: { enabled: true, range },
+                  })
+                }}
               />
             </div>
           ) : null}

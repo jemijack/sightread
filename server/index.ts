@@ -4,13 +4,15 @@ import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { WebSocketServer, WebSocket } from 'ws'
 import { createMidiCapture } from './midi-capture.js'
+import { handleUploadRequest } from './upload-song.js'
 import { handleStaticRequest } from './static-server.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const PORT = parseInt(process.env.PORT ?? '3000', 10)
 const BUILD_DIR = resolve(__dirname, '../build/client')
 
-const server = createServer((req, res) => {
+const server = createServer(async (req, res) => {
+  if (await handleUploadRequest(req, res)) return
   handleStaticRequest(BUILD_DIR, req, res)
 })
 

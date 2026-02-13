@@ -216,11 +216,7 @@ export default function TimelineStrip({
             className="absolute top-1 bottom-1 rounded-sm border border-violet-400/40 bg-violet-500/15"
           >
             <div
-              className={clsx(
-                'absolute top-0 bottom-0 -left-1.5 flex w-3 items-center justify-center rounded-l bg-violet-500/90 shadow-md',
-                'cursor-w-resize transition-colors hover:bg-violet-400',
-              )}
-              style={{ minWidth: MIN_HANDLE_WIDTH }}
+              className="absolute -left-5 top-1/2 flex h-12 w-10 -translate-y-1/2 cursor-w-resize items-center justify-center"
               data-timeline-handle="true"
               onPointerDown={(event) => {
                 event.preventDefault()
@@ -230,14 +226,17 @@ export default function TimelineStrip({
                 pauseForScrub()
               }}
             >
-              <div className="h-4 w-0.5 rounded-full bg-white/60" />
+              <div
+                className={clsx(
+                  'flex h-full w-3 items-center justify-center rounded-l bg-violet-500/90 shadow-md',
+                  'transition-colors hover:bg-violet-400',
+                )}
+              >
+                <div className="h-4 w-0.5 rounded-full bg-white/60" />
+              </div>
             </div>
             <div
-              className={clsx(
-                'absolute top-0 -right-1.5 bottom-0 flex w-3 items-center justify-center rounded-r bg-violet-500/90 shadow-md',
-                'cursor-e-resize transition-colors hover:bg-violet-400',
-              )}
-              style={{ minWidth: MIN_HANDLE_WIDTH }}
+              className="absolute -right-5 top-1/2 flex h-12 w-10 -translate-y-1/2 cursor-e-resize items-center justify-center"
               data-timeline-handle="true"
               onPointerDown={(event) => {
                 event.preventDefault()
@@ -247,7 +246,14 @@ export default function TimelineStrip({
                 pauseForScrub()
               }}
             >
-              <div className="h-4 w-0.5 rounded-full bg-white/60" />
+              <div
+                className={clsx(
+                  'flex h-full w-3 items-center justify-center rounded-r bg-violet-500/90 shadow-md',
+                  'transition-colors hover:bg-violet-400',
+                )}
+              >
+                <div className="h-4 w-0.5 rounded-full bg-white/60" />
+              </div>
             </div>
           </div>
         )}

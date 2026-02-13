@@ -37,7 +37,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
         {/* Favicons */}
         <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/icon-192.png" />
+
+        {/* PWA */}
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
         {/* Global Site Tag (gtag.js) - Google Analytics */}
         <script defer src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`} />

@@ -1,5 +1,5 @@
 [
-    {
+  {
     "file": "music/songs/Numb-Little-Bug.mid",
     "title": "Numb-Little-Bug.mid",
     "source": "builtin",
@@ -160,5 +160,12 @@
     "duration": 23,
     "url": "https://musescore.com/user/29786779/scores/5246287",
     "license": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  {
+    "file": "music/songs/Salted-transcribed-by-Xeoran-Wynncraft-Luxury-of-the-Cease-Fire-Ragni.mid",
+    "title": "Salted Transcribed By Xeoran Wynncraft Luxury Of The Cease Fire Ragni",
+    "source": "builtin",
+    "id": "Salted-transcribed-by-Xeoran-Wynncraft-Luxury-of-the-Cease-Fire-Ragni.mid",
+    "duration": 116
   }
 ]

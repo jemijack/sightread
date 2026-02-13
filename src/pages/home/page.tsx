@@ -1,5 +1,5 @@
 import { AppBar, MarketingFooter, Sizer } from '@/components'
-import React from 'react'
+import React, { useRef } from 'react'
 import { Link } from 'react-router'
 import { FeaturedSongsPreview } from './FeaturedSongsPreview'
 
@@ -27,6 +27,7 @@ export default function Home() {
                       Free play
                     </Button>
                   </Link>
+                  <AddSongButton />
                 </div>
               </div>
               <div className="flex justify-center md:justify-end">
@@ -99,18 +100,70 @@ export default function Home() {
   )
 }
 
+function AddSongButton() {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [status, setStatus] = React.useState<'idle' | 'uploading' | 'done' | 'error'>('idle')
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setStatus('uploading')
+    try {
+      const form = new FormData()
+      form.append('file', file)
+      const res = await fetch('/api/upload', { method: 'POST', body: form })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Upload failed')
+      setStatus('done')
+      setTimeout(() => setStatus('idle'), 2000)
+    } catch {
+      setStatus('error')
+      setTimeout(() => setStatus('idle'), 3000)
+    }
+    // Reset input so the same file can be re-uploaded
+    if (inputRef.current) inputRef.current.value = ''
+  }
+
+  const label =
+    status === 'uploading' ? 'Uploading...' :
+    status === 'done' ? 'Added!' :
+    status === 'error' ? 'Failed' :
+    'Add a song'
+
+  return (
+    <>
+      <input
+        ref={inputRef}
+        type="file"
+        accept=".mid,.midi"
+        className="hidden"
+        onChange={handleFile}
+      />
+      <Button
+        className="border border-white/50 text-white hover:bg-white/10"
+        onClick={() => inputRef.current?.click()}
+      >
+        {label}
+      </Button>
+    </>
+  )
+}
+
 function Button({
   children,
   style,
   className,
+  onClick,
 }: {
   children?: React.ReactNode
   style?: React.CSSProperties
   className?: string
+  onClick?: () => void
 }) {
   return (
     <button
       className={className}
+      onClick={onClick}
       style={{
         transition: 'background-color 150ms',
         cursor: 'pointer',

@@ -19,9 +19,11 @@ import {
   Hourglass,
   Key,
   ListMusic,
+  Minus,
   Monitor,
   Pause,
   Play,
+  Plus,
   Repeat,
   SlidersHorizontal,
   Timer,
@@ -41,6 +43,7 @@ type SidebarProps = {
   onClose?: () => void
   isLooping: boolean
   onLoopToggled: (b: boolean) => void
+  onSetLoopRange?: (range: { start: number; end: number }) => void
 }
 
 const METRONOME_PRESETS = [0.25, 0.5, 1, 2, 4]
@@ -275,13 +278,21 @@ export default function SettingsPanel(props: SidebarProps) {
             </div>
           </SettingRow>
 
-          <SettingRow
-            icon={<Repeat className="h-4 w-4" />}
-            title="Loop Section"
-            subtitle="Repeat selected bars"
-          >
-            <SidebarSwitch isSelected={isLooping} onChange={onLoopToggled} />
-          </SettingRow>
+          <div className="space-y-4">
+            <SettingRow
+              icon={<Repeat className="h-4 w-4" />}
+              title="Loop Section"
+              subtitle="Repeat selected bars"
+            >
+              <SidebarSwitch isSelected={isLooping} onChange={onLoopToggled} />
+            </SettingRow>
+            {isLooping && props.onSetLoopRange && (
+              <LoopRangeControls
+                loopRange={props.config.loop?.range}
+                onSetLoopRange={props.onSetLoopRange}
+              />
+            )}
+          </div>
 
           <SettingRow
             icon={<Hourglass className="h-4 w-4" />}
@@ -684,6 +695,84 @@ type SegmentedToggleProps = {
   options: SegmentedOption[]
   onChange: (id: string) => void
   className?: string
+}
+
+function LoopRangeControls({
+  loopRange,
+  onSetLoopRange,
+}: {
+  loopRange?: { start: number; end: number }
+  onSetLoopRange: (range: { start: number; end: number }) => void
+}) {
+  const player = usePlayer()
+  const range = loopRange ?? { start: 0, end: player.getDuration() }
+  const startMeasure = player.getMeasureForTime(range.start)
+  const endMeasure = player.getMeasureForTime(range.end - 0.01)
+
+  const adjustStart = (direction: -1 | 1) => {
+    const newTime =
+      direction === -1
+        ? player.getPreviousMeasureTime(range.start)
+        : player.getNextMeasureTime(range.start)
+    if (newTime == null) return
+    if (newTime >= range.end) return
+    onSetLoopRange({ start: newTime, end: range.end })
+  }
+
+  const adjustEnd = (direction: -1 | 1) => {
+    const newTime =
+      direction === -1
+        ? player.getPreviousMeasureTime(range.end)
+        : player.getNextMeasureTime(range.end)
+    if (newTime == null) return
+    if (newTime <= range.start) return
+    onSetLoopRange({ start: range.start, end: newTime })
+  }
+
+  return (
+    <div className="ml-2 space-y-3 border-l border-[#2b2a33] pl-9">
+      <div className="flex items-center justify-between">
+        <label className="text-xs font-medium text-white">Start bar</label>
+        <div className="flex items-center gap-1">
+          <StepButton onClick={() => adjustStart(-1)}>
+            <Minus className="h-3.5 w-3.5" />
+          </StepButton>
+          <span className="w-10 text-center text-sm font-semibold tabular-nums text-white">
+            {startMeasure.number}
+          </span>
+          <StepButton onClick={() => adjustStart(1)}>
+            <Plus className="h-3.5 w-3.5" />
+          </StepButton>
+        </div>
+      </div>
+      <div className="flex items-center justify-between">
+        <label className="text-xs font-medium text-white">End bar</label>
+        <div className="flex items-center gap-1">
+          <StepButton onClick={() => adjustEnd(-1)}>
+            <Minus className="h-3.5 w-3.5" />
+          </StepButton>
+          <span className="w-10 text-center text-sm font-semibold tabular-nums text-white">
+            {endMeasure.number}
+          </span>
+          <StepButton onClick={() => adjustEnd(1)}>
+            <Plus className="h-3.5 w-3.5" />
+          </StepButton>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function StepButton({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      className="flex h-9 w-9 items-center justify-center rounded-md bg-[#322e3b] text-gray-300 transition hover:bg-violet-600 hover:text-white active:bg-violet-700"
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  )
 }
 
 function SegmentedToggle({ value, options, onChange, className }: SegmentedToggleProps) {
